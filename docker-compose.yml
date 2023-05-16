@@ -16,7 +16,7 @@ services:
       retries: 10
 
   adminer:
-    image: adminer
+    image: phpmyadmin
     restart: always
     ports:
       - 8081:8080
