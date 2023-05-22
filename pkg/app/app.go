@@ -3,20 +3,19 @@ package app
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/markraiter/chat/config"
 	"github.com/markraiter/chat/pkg/models"
+	"github.com/markraiter/chat/pkg/repo"
 )
 
 var (
 	msg = models.NewMessage()
-	usr = models.NewUser()
-	db  = config.NewDatabase()
+	db  = repo.NewDatabase()
 )
 
 func Start() {
 	//setup
 	db.ConnectToDB()
-	// db.MakeMigrations()
+	db.MakeMigrations()
 
 	e := echo.New()
 
@@ -27,11 +26,11 @@ func Start() {
 	e.GET("/ws", msg.HandleWS)
 	go msg.HandleMSG()
 
-	// users endpoints
-	e.GET("/users", usr.GetUsers(db.DB))
-	e.GET("/users/:id", usr.GetUserByID(db.DB))
-	e.POST("/register", usr.Register(db.DB))
-	e.POST("/login", usr.Login(db.DB))
+	// db endpoints
+	e.POST("/register", db.Register)
+	e.POST("/login", db.Login)
+	e.GET("/users", db.GetUsers)
+	e.GET("/users/:id", db.GetUserByID)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
