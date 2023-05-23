@@ -18,6 +18,8 @@ type Blacklist interface {
 
 type Service struct {
 	Authorization
+	FriendList
+	Blacklist
 }
 
 func NewService(repos *repository.Repository) *Service {

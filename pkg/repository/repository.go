@@ -19,6 +19,8 @@ type Blacklist interface {
 
 type Repository struct {
 	Authorization
+	FriendList
+	Blacklist
 }
 
 func NewRepository(db *sql.DB) *Repository {
