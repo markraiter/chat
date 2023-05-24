@@ -26,7 +26,7 @@ func (db *Database) ConnectToDB() {
 	dsn := "root:example@tcp(db:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
 	db.DB, db.Err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if db.Err != nil {
-		log.Fatalf("error connecting to database: %s/n", db.Err.Error())
+		log.Fatalf("error connecting to database: %s\n", db.Err.Error())
 	}
 }
 
