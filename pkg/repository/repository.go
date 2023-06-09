@@ -1,13 +1,12 @@
 package repository
 
 import (
-	"database/sql"
-
 	"github.com/markraiter/chat/models"
+	"gorm.io/gorm"
 )
 
 type Authorization interface {
-	CreateUser(user models.User) (int, error)
+	CreateUser(user models.User) (models.User, error)
 	GetUser(username, password string) (models.User, error)
 }
 
@@ -23,7 +22,7 @@ type Repository struct {
 	Blacklist
 }
 
-func NewRepository(db *sql.DB) *Repository {
+func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthMySQL(db),
 	}

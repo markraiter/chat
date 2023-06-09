@@ -1,9 +1,11 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const (
@@ -21,15 +23,10 @@ type Config struct {
 	DBName     string
 }
 
-func NewMySQLDB(cfg Config) (*sql.DB, error) {
-	db, err := sql.Open(cfg.Driver, fmt.Sprintf("%s:%s@%s(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Connection, cfg.Host, cfg.Port, cfg.DBName))
+func NewMySQLDB(cfg Config) (*gorm.DB, error) {
+	db, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@%s(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Connection, cfg.Host, cfg.Port, cfg.DBName)), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("error connecting to database: %s\n", err.Error())
-	}
-
-	err = db.Ping()
-	if err != nil {
-		return nil, err
 	}
 
 	return db, nil

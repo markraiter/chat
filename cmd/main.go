@@ -61,8 +61,4 @@ func main() {
 	if err := srv.Shutdown(context.Background()); err != nil {
 		log.Fatalf("error occured while server shutting down: %s\n", err.Error())
 	}
-
-	if err := db.Close(); err != nil {
-		log.Fatalf("error occured on db conection close: %s\n", err.Error())
-	}
 }
