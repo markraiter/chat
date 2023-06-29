@@ -15,10 +15,10 @@ func NewAuthMySQL(db *gorm.DB) *AuthMySQL {
 	}
 }
 
-func (r *AuthMySQL) CreateUser(user models.User) (models.User, error) {
+func (r *AuthMySQL) CreateUser(user models.User) (int, error) {
 	r.db.Create(&user)
 
-	return user, nil
+	return int(user.ID), nil
 }
 
 func (r *AuthMySQL) GetUser(username, password string) (models.User, error) {

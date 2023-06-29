@@ -6,7 +6,7 @@ import (
 )
 
 type Authorization interface {
-	CreateUser(user models.User) (models.User, error)
+	CreateUser(user models.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 }
 

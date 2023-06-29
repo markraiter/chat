@@ -29,16 +29,12 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		friendList := api.Group("/friendlist")
 		{
 			friendList.POST("/", h.addToFriends)
-			friendList.GET("/", h.getAllFriends)
-			friendList.GET("/:id", h.getFriend)
 			friendList.DELETE("/:id", h.deleteFriend)
 		}
 
 		blacklist := api.Group("/blacklist")
 		{
 			blacklist.POST("/", h.addToBlacklist)
-			blacklist.GET("/", h.getAllBlocked)
-			blacklist.GET("/:id", h.getBlocked)
 			blacklist.DELETE("/:id", h.deleteFromBlacklist)
 		}
 	}

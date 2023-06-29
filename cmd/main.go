@@ -7,9 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/markraiter/chat/cmd/server"
+	"github.com/markraiter/chat/models"
 	"github.com/markraiter/chat/pkg/handler"
 	"github.com/markraiter/chat/pkg/repository"
+	"github.com/markraiter/chat/pkg/server"
 	"github.com/markraiter/chat/pkg/service"
 	"github.com/spf13/viper"
 )
@@ -38,6 +39,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("error initializing database: %s\n", err.Error())
 	}
+
+	db.AutoMigrate(&models.User{}, &models.Message{})
 
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)

@@ -8,24 +8,20 @@ import (
 )
 
 type LoginInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func (h *Handler) register(c echo.Context) error {
 	var input models.User
 
 	if err := c.Bind(&input); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
-		})
+		return c.String(echo.ErrBadRequest.Code, err.Error())
 	}
 
 	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
-		})
+		return c.String(echo.ErrInternalServerError.Code, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -37,16 +33,12 @@ func (h *Handler) login(c echo.Context) error {
 	var input LoginInput
 
 	if err := c.Bind(&input); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
-		})
+		return c.String(echo.ErrBadRequest.Code, err.Error())
 	}
 
 	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
-		})
+		return c.String(echo.ErrInternalServerError.Code, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
