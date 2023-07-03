@@ -1,13 +1,4 @@
-port: "1323"
-
-# db: 
-#   driver: "mysql"
-#   username: "root"
-#   password: "example"
-#   connection: "tcp"
-#   host: "db"
-#   port: "3306"
-#   dbname: "chat" 
+port: ":1323"
 
 db: 
   driver: "mysql"
@@ -17,3 +8,13 @@ db:
   host: "localhost"
   port: "3306"
   dbname: "chat" 
+
+
+# db: 
+#   driver: "mysql"
+#   username: "root"
+#   password: "example"
+#   connection: "tcp"
+#   host: "db"
+#   port: "3306"
+#   dbname: "chat" 

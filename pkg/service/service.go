@@ -11,9 +11,13 @@ type Authorization interface {
 }
 
 type FriendList interface {
+	AddFriend(friendship *models.Friendship) error
+	DeleteFriend(userID, friendID int, friendship *models.Friendship) error
 }
 
 type Blacklist interface {
+	AddToBlacklist(blockedUser *models.Blacklist) error
+	RemoveFromBlacklist(userID, blockedUserID int, blockedUser *models.Blacklist) error
 }
 
 type Service struct {
@@ -25,5 +29,7 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		FriendList:    NewFriendlistService(repos.FriendList),
+		Blacklist:     NewBlacklistService(repos.Blacklist),
 	}
 }

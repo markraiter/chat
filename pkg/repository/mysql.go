@@ -8,11 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	usersTable    = "users"
-	messagesTable = "messages"
-)
-
 type Config struct {
 	Driver     string
 	Username   string
