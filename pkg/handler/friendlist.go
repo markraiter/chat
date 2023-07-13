@@ -9,10 +9,7 @@ import (
 )
 
 func (h *Handler) addToFriends(c echo.Context) error {
-	userID, err := strconv.Atoi(c.FormValue("user_id"))
-	if err != nil {
-		return c.String(echo.ErrBadRequest.Code, err.Error())
-	}
+	userID := c.Get("user_id").(int)
 	friendID, err := strconv.Atoi(c.FormValue("friend_id"))
 	if err != nil {
 		return c.String(echo.ErrBadRequest.Code, err.Error())
@@ -31,11 +28,8 @@ func (h *Handler) addToFriends(c echo.Context) error {
 }
 
 func (h *Handler) deleteFriend(c echo.Context) error {
-	userID, err := strconv.Atoi(c.FormValue("user_id"))
-	if err != nil {
-		return c.String(echo.ErrBadRequest.Code, err.Error())
-	}
-	friendID, err := strconv.Atoi(c.FormValue("friend_id"))
+	userID := c.Get("user_id").(int)
+	friendID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.String(echo.ErrBadRequest.Code, err.Error())
 	}

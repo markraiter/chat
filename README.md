@@ -31,14 +31,14 @@ The user cannot write to you if he is on the black list.
 
 5. Chat:
 
-- Page with chats
+- Page with chats (TODO:)
 
-- Chat with a specific user
+- Chat with a specific user (TODO:)
 
 6. Settings:
 
-- Possibility to change the password
+- Possibility to change the password (TODO:)
 
-- Ability to change nickname
+- Ability to change nickname (TODO:)
 
-- Ability to change avatar
+- Ability to change avatar (TODO:)

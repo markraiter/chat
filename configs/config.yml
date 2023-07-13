@@ -5,16 +5,7 @@ db:
   username: "root"
   password: "example"
   connection: "tcp"
-  host: "localhost"
+  # host: "localhost"
+  host: "db"
   port: "3306"
   dbname: "chat" 
-
-
-# db: 
-#   driver: "mysql"
-#   username: "root"
-#   password: "example"
-#   connection: "tcp"
-#   host: "db"
-#   port: "3306"
-#   dbname: "chat" 

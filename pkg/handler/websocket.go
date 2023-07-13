@@ -8,6 +8,10 @@ import (
 	"github.com/markraiter/chat/models"
 )
 
+func (h *Handler) isUserBlocked(userID int) bool {
+	return false
+}
+
 func (h *Handler) broadcastMessage(message models.Message) {
 	for client := range h.clients {
 		err := client.WriteJSON(message)
@@ -35,6 +39,10 @@ func (h *Handler) websocketHandler(c echo.Context) error {
 			log.Printf("error reading message: %s", err.Error())
 			delete(h.clients, conn)
 			break
+		}
+
+		if h.isUserBlocked(message.UserID) {
+			continue
 		}
 
 		h.broadcast <- message

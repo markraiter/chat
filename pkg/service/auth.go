@@ -9,6 +9,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type Authorization interface {
+	CreateUser(user models.User) (int, error)
+	GenerateToken(username, password string) (string, error)
+}
+
 type AuthService struct {
 	repo repository.Authorization
 }

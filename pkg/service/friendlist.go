@@ -5,6 +5,11 @@ import (
 	"github.com/markraiter/chat/pkg/repository"
 )
 
+type FriendList interface {
+	AddFriend(friendship *models.Friendship) error
+	DeleteFriend(userID, friendID int, friendship *models.Friendship) error
+}
+
 type FriendlistService struct {
 	repo repository.FriendList
 }

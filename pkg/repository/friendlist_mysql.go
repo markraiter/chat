@@ -5,6 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type FriendList interface {
+	AddFriend(friendship *models.Friendship) error
+	DeleteFriend(userID, friendID int, friendship *models.Friendship) error
+}
+
 type FriendlistMySQL struct {
 	db *gorm.DB
 }
