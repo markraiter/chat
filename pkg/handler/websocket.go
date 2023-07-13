@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) isUserBlocked(userID int) bool {
-	return false
+	return h.isUserBlocked(userID)
 }
 
 func (h *Handler) broadcastMessage(message models.Message) {
