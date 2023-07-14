@@ -8,8 +8,8 @@ import (
 	"github.com/markraiter/chat/models"
 )
 
-func (h *Handler) isUserBlocked(userID int) bool {
-	return h.isUserBlocked(userID)
+func (h *Handler) isUserBlocked(userID, blockedUserID int) bool {
+	return h.services.IsUserBlocked(userID, blockedUserID)
 }
 
 func (h *Handler) broadcastMessage(message models.Message) {
@@ -41,7 +41,7 @@ func (h *Handler) websocketHandler(c echo.Context) error {
 			break
 		}
 
-		if h.isUserBlocked(message.UserID) {
+		if h.isUserBlocked(message.UserID, message.BlockedUserID) {
 			continue
 		}
 

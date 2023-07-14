@@ -8,7 +8,7 @@ import (
 type Blacklist interface {
 	AddToBlacklist(blockedUser *models.Blacklist) error
 	RemoveFromBlacklist(userID, blockedUserID int, blockedUser *models.Blacklist) error
-	IsUserBlocked(userID, blockedUserID int) (bool, error)
+	IsUserBlocked(userID, blockedUserID int) bool
 }
 
 type BlacklistService struct {
@@ -27,11 +27,11 @@ func (s *BlacklistService) RemoveFromBlacklist(userID, blockedUserID int, blocke
 	return s.repo.RemoveFromBlacklist(userID, blockedUserID, blockedUser)
 }
 
-func (s *BlacklistService) IsUserBlocked(userID, blockedUserID int) (bool, error) {
+func (s *BlacklistService) IsUserBlocked(userID, blockedUserID int) bool {
 	blockedUser, err := s.repo.GetBlockedUser(userID, blockedUserID)
 	if err != nil {
-		return false, err
+		return false
 	}
 
-	return blockedUser != nil, nil
+	return blockedUser != nil
 }
