@@ -34,7 +34,7 @@ func (h *Handler) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			userID := uint(claims["id"].(float64))
+			userID := claims["id"]
 			c.Set("user_id", userID)
 
 			return next(c)
