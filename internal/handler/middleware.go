@@ -12,6 +12,7 @@ const (
 	authHeader = "Authorization"
 )
 
+// JWTMiddleware function is authentification middleware for checking the correct token
 func (h *Handler) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		authHeader := c.Request().Header.Get(authHeader)

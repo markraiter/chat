@@ -8,4 +8,4 @@ db:
   host: "localhost"
   # host: "db"
   port: "3306"
-  dbname: "chat" 
+  dbname: "chat1" 

@@ -3,25 +3,21 @@ package main
 import (
 	"log"
 
+	"github.com/markraiter/chat/internal/handler"
+	"github.com/markraiter/chat/internal/storage"
+	"github.com/markraiter/chat/internal/storage/mysql"
 	"github.com/markraiter/chat/models"
-	"github.com/markraiter/chat/pkg/handler"
-	"github.com/markraiter/chat/pkg/repository"
-	"github.com/markraiter/chat/pkg/service"
 	"github.com/spf13/viper"
 )
 
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
-}
-
 func main() {
+	// Initialization of .yml config file
 	if err := initConfig(); err != nil {
-		log.Fatalf("error initializing config: %s\n", err.Error())
+		log.Fatalf("Error initializing configs: %s", err.Error())
 	}
 
-	db, err := repository.NewMySQLDB(repository.Config{
+	// Initialization of the MySQL database
+	db, err := mysql.NewMySQL(mysql.Config{
 		Driver:     viper.GetString("db.driver"),
 		Username:   viper.GetString("db.username"),
 		Password:   viper.GetString("db.password"),
@@ -32,15 +28,27 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("error initializing database: %s\n", err.Error())
+		log.Fatalf("Error initializing database: %s", err.Error())
 	}
 
-	db.AutoMigrate(&models.User{}, &models.Message{}, &models.Friendship{}, &models.Blacklist{})
+	// Making migrations using GORM
+	db.AutoMigrate(&models.User{})
 
-	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
+	// Initialization of the storage
+	s := storage.NewStorage(db)
+	// Initialization of the handler
+	h := handler.NewHandler(s)
 
-	e := handlers.InitRoutes()
+	// Initialization of the router and routes
+	e := h.InitRoutes()
+
+	// Starting the server
 	e.Logger.Fatal(e.Start(viper.GetString("port")))
+}
+
+// initConfig initializes .yml configuration file for the chat application
+func initConfig() error {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
