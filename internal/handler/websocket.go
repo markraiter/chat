@@ -1,0 +1,47 @@
+package handler
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/labstack/echo/v4"
+	"github.com/markraiter/chat/models"
+)
+
+// broadcastMessage function sends message via websocket connection
+func (h *Handler) broadcastMessage(message models.Message) {
+	for client := range h.clients {
+		err := client.WriteJSON(message)
+		if err != nil {
+			log.Printf("error writing message: %v", err)
+			client.Close()
+			delete(h.clients, client)
+		}
+	}
+}
+
+// handleWS handles websocket connetcion
+func (h *Handler) handleWS(c echo.Context) error {
+	conn, err := h.upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		return fmt.Errorf("error upgrading to WebSocket: %w", err)
+	}
+	defer conn.Close()
+
+	h.clients[conn] = true
+
+	for {
+		var message models.Message
+		err := conn.ReadJSON(&message)
+		if err != nil {
+			log.Printf("error reading message: %v", err)
+			delete(h.clients, conn)
+			break
+		}
+
+		h.broadcast <- message
+		h.broadcastMessage(message)
+	}
+
+	return nil
+}

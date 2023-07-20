@@ -11,8 +11,8 @@ import (
 
 // Authorization interface describes all methods for authorization
 type Authorization interface {
-	CreateUser(user models.User) (uint, error)
-	GetUser(username, password string) (*models.User, error)
+	CreateUser(user *models.User) (uint, error)
+	GetUserByUsername(username, password string) (*models.User, error)
 	GetUsername(username string) string
 	GenerateToken(username, password string) (string, error)
 }
@@ -22,7 +22,7 @@ type Auth struct {
 	db *gorm.DB
 }
 
-// NewAuth function is a construction function for Auth struct
+// NewAuth function is a constructor function for Auth struct
 func NewAuth(db *gorm.DB) *Auth {
 	return &Auth{db: db}
 }
@@ -40,8 +40,8 @@ func (s *Auth) CreateUser(user models.User) (uint, error) {
 	return user.ID, nil
 }
 
-// GetUser function finds user in the database by username
-func (s *Auth) GetUser(username, password string) (*models.User, error) {
+// GetUserByUsername function finds user in the database by username
+func (s *Auth) GetUserByUsername(username, password string) (*models.User, error) {
 	user := new(models.User)
 
 	if err := s.db.Where("username = ?", username).First(&user).Error; err != nil || !user.ComparePassword(password) {
@@ -51,7 +51,7 @@ func (s *Auth) GetUser(username, password string) (*models.User, error) {
 	return user, nil
 }
 
-// GetUsername retreives username from existing user
+// GetUsername retrieves username from existing user
 func (s *Auth) GetUsername(username string) string {
 	user := new(models.User)
 
@@ -64,7 +64,7 @@ func (s *Auth) GetUsername(username string) string {
 
 // GenerateToken function generates entry token for user to login the chat
 func (s *Auth) GenerateToken(username, password string) (string, error) {
-	user, err := s.GetUser(username, password)
+	user, err := s.GetUserByUsername(username, password)
 	if err != nil {
 		return "", fmt.Errorf("no such user in the database: %w", err)
 	}

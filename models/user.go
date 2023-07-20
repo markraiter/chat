@@ -24,6 +24,11 @@ func generatePasswordHash(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
+// ComparePassword function compares input password with hashed password in the database
+func (u *User) ComparePassword(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)) == nil
+}
+
 // BeforeCreate function generates hash from password if len(password) > 0
 func (u *User) BeforeCreate() error {
 	if len(u.Password) > 0 {
@@ -36,9 +41,4 @@ func (u *User) BeforeCreate() error {
 	}
 
 	return nil
-}
-
-// ComparePassword function compares input password with hashed password in the database
-func (u *User) ComparePassword(password string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)) == nil
 }
