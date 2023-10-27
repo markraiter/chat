@@ -54,6 +54,10 @@ tasks:
   migrate-up:
     cmds:
       - migrate -path internal/storage/postgres/migrations -database "postgresql://root:password@localhost:5433/chat-app-db?sslmode=disable" -verbose up
+  
+  migrate-down:
+    cmds:
+      - migrate -path internal/storage/postgres/migrations -database "postgresql://root:password@localhost:5433/chat-app-db?sslmode=disable" -verbose down
 
   postgres:
     cmds:
