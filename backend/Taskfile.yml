@@ -1,0 +1,69 @@
+version: "3"
+
+dotenv: ['.env']
+
+tasks:
+  fmt:
+      cmds:
+        - go fmt ./...
+
+  run:
+    env:
+      DB_HOST: localhost
+    cmds:
+      - go run cmd/main.go
+
+  lintcheck:
+    cmds:
+      - golangci-lint run
+
+  test:
+    cmds:
+      - go test ./...
+
+  coverage:
+    cmds:
+      - go test ./... -coverprofile=coverage.out
+      - go tool cover -html=coverage.out -o coverage.html
+      - xdg-open ./coverage.html
+
+  swaginit:
+    cmds:
+      - swag init --outputTypes go,yaml -g cmd/main.go internal/models
+
+  postgres-up:
+    cmds:
+      - docker run --name postgres15 -p 5433:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres:15-alpine
+
+  postgress-down:
+    cmds:
+      - docker stop postgres15
+  
+  create-db:
+    cmds:
+      - docker exec -it postgres15 createdb --username=root --owner=root chat-app-db
+
+  drop-db:
+    cmds:
+      - docker exec -it postgres15 dropdb chat-app-db
+
+  create-migrations:
+    cmds:
+      - migrate create -ext sql -dir ./ add_users_table
+
+  migrate-up:
+    cmds:
+      - migrate -path internal/storage/postgres/migrations -database "postgresql://root:password@localhost:5433/chat-app-db?sslmode=disable" -verbose up
+
+  postgres:
+    cmds:
+      - docker exec -it postgres15 psql
+
+
+  # build:
+  #   cmds:
+  #     - git stash
+  #     - git pull
+  #     - docker compose -f production.yml build
+  #     - docker compose -f production.yml down
+  #     - docker compose -f production.yml up -d
