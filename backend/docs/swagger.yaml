@@ -1,0 +1,61 @@
+basePath: /
+definitions:
+  user.CreateUserReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  util.Response:
+    properties:
+      message:
+        example: response message
+        type: string
+    type: object
+info:
+  contact:
+    email: raitermark@proton.me
+    name: Mark Raiter
+  description: Docs for chat app backend API
+  title: CHAT APP
+  version: "1.0"
+paths:
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/util.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: SignUp
+      tags:
+      - Auth
+swagger: "2.0"

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/lib/pq"
 )
@@ -13,7 +14,7 @@ type Database struct {
 func NewDB() (*Database, error) {
 	db, err := sql.Open("postgres", "postgresql://root:password@localhost:5433/chat-app-db?sslmode=disable")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("storage NewDB() error: %w", err)
 	}
 
 	return &Database{db: db}, nil
