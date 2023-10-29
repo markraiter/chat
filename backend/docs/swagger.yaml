@@ -9,6 +9,13 @@ definitions:
       username:
         type: string
     type: object
+  user.LoginUserReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   util.Response:
     properties:
       message:
@@ -23,6 +30,55 @@ info:
   title: CHAT APP
   version: "1.0"
 paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      operationId: login
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoginUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/util.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Login
+      tags:
+      - Auth
+  /logout:
+    get:
+      description: Logout
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Logout
+      tags:
+      - Auth
   /signup:
     post:
       consumes:

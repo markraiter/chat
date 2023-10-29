@@ -15,6 +15,8 @@ func InitRouter(userHandler *user.Handler) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.POST("/signup", userHandler.CreateUser)
+	r.POST("/login", userHandler.Login)
+	r.GET("/logout", userHandler.Logout)
 }
 
 func Start(addr string) error {
