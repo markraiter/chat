@@ -34,7 +34,7 @@ const docTemplate = `{
                 "operationId": "login",
                 "parameters": [
                     {
-                        "description": "account info",
+                        "description": "credentials",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -144,6 +144,148 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/ws/create-room": {
+            "post": {
+                "description": "create room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websocket"
+                ],
+                "summary": "CreateRoom",
+                "operationId": "create-room",
+                "parameters": [
+                    {
+                        "description": "room info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/websocket.CreateRoomReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/get-clients": {
+            "get": {
+                "description": "get all clients in the room",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websocket"
+                ],
+                "summary": "GetClients",
+                "operationId": "get-clients",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "room_id",
+                        "name": "room_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/get-rooms": {
+            "get": {
+                "description": "get all rooms",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websocket"
+                ],
+                "summary": "GetRooms",
+                "operationId": "get-rooms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/join-room": {
+            "get": {
+                "description": "join room",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websocket"
+                ],
+                "summary": "JoinRoom",
+                "operationId": "join-room",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "room_id",
+                        "name": "room_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "user_id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -178,6 +320,17 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "response message"
+                }
+            }
+        },
+        "websocket.CreateRoomReq": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         }

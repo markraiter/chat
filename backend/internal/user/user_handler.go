@@ -53,7 +53,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 // @ID login
 // @Accept  json
 // @Produce  json
-// @Param input body user.LoginUserReq true "account info"
+// @Param input body user.LoginUserReq true "credentials"
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response
 // @Failure 406 {object} util.Response

@@ -22,6 +22,13 @@ definitions:
         example: response message
         type: string
     type: object
+  websocket.CreateRoomReq:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
 info:
   contact:
     email: raitermark@proton.me
@@ -37,7 +44,7 @@ paths:
       description: Login
       operationId: login
       parameters:
-      - description: account info
+      - description: credentials
         in: body
         name: input
         required: true
@@ -114,4 +121,99 @@ paths:
       summary: SignUp
       tags:
       - Auth
+  /ws/create-room:
+    post:
+      consumes:
+      - application/json
+      description: create room
+      operationId: create-room
+      parameters:
+      - description: room info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/websocket.CreateRoomReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: CreateRoom
+      tags:
+      - Websocket
+  /ws/get-clients:
+    get:
+      description: get all clients in the room
+      operationId: get-clients
+      parameters:
+      - description: room_id
+        in: path
+        name: room_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: GetClients
+      tags:
+      - Websocket
+  /ws/get-rooms:
+    get:
+      description: get all rooms
+      operationId: get-rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: GetRooms
+      tags:
+      - Websocket
+  /ws/join-room:
+    get:
+      description: join room
+      operationId: join-room
+      parameters:
+      - description: room_id
+        in: path
+        name: room_id
+        required: true
+        type: string
+      - description: user_id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: username
+        in: query
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: JoinRoom
+      tags:
+      - Websocket
 swagger: "2.0"

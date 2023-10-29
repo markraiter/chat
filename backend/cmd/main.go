@@ -8,6 +8,7 @@ import (
 	"github.com/markraiter/chat/internal/router"
 	"github.com/markraiter/chat/internal/storage/postgres"
 	"github.com/markraiter/chat/internal/user"
+	"github.com/markraiter/chat/internal/websocket"
 )
 
 //	@title			CHAT APP
@@ -28,6 +29,10 @@ func main() {
 	userService := user.NewService(userRepository)
 	userHandler := user.NewHandler(userService)
 
-	router.InitRouter(userHandler)
+	hub := websocket.NewHub()
+	wsHandler := websocket.NewHandler(hub)
+	go hub.Run()
+
+	router.InitRouter(userHandler, wsHandler)
 	router.Start("localhost:9000")
 }
