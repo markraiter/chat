@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	_ "github.com/markraiter/chat/docs"
 
+	"github.com/markraiter/chat/internal/configs"
 	"github.com/markraiter/chat/internal/router"
 	"github.com/markraiter/chat/internal/storage/postgres"
 	"github.com/markraiter/chat/internal/user"
@@ -20,7 +22,16 @@ import (
 //	@BasePath		/
 
 func main() {
-	dbConn, err := postgres.NewDB()
+	cfg, err := configs.InitConfig()
+	if err != nil {
+		log.Fatalf("InitConfig error: %s\n", err.Error())
+
+		return
+	}
+
+	fmt.Printf("%+v\n", cfg)
+
+	dbConn, err := postgres.NewDB(cfg.DB)
 	if err != nil {
 		log.Fatalf("could not initialize database connection: %s\n", err.Error())
 	}
@@ -34,5 +45,5 @@ func main() {
 	go hub.Run()
 
 	router.InitRouter(userHandler, wsHandler)
-	router.Start("localhost:9000")
+	router.Start(cfg.Server.AppAddress)
 }

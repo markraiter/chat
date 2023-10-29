@@ -5,14 +5,15 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
+	"github.com/markraiter/chat/internal/configs"
 )
 
 type Database struct {
 	db *sql.DB
 }
 
-func NewDB() (*Database, error) {
-	db, err := sql.Open("postgres", "postgresql://root:password@localhost:5433/chat-app-db?sslmode=disable")
+func NewDB(cfg configs.Postgres) (*Database, error) {
+	db, err := sql.Open(cfg.Driver, cfg.ConnString)
 	if err != nil {
 		return nil, fmt.Errorf("storage NewDB() error: %w", err)
 	}

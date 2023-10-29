@@ -1,6 +1,8 @@
 package user
 
-import "context"
+import (
+	"context"
+)
 
 type User struct {
 	ID       int64  `json:"id" db:"id"`

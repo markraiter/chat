@@ -3,6 +3,7 @@ module github.com/markraiter/chat
 go 1.20
 
 require (
+	github.com/caarlos0/env/v8 v8.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.0
