@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+
+	"github.com/markraiter/chat/internal/configs"
 )
 
 type User struct {
@@ -40,6 +42,6 @@ type Repository interface {
 }
 
 type Service interface {
-	CreateUser(c context.Context, req *CreateUserReq) (*CreateUserRes, error)
-	Login(c context.Context, req *LoginUserReq) (*LoginUserRes, error)
+	CreateUser(cfg configs.Config, c context.Context, req *CreateUserReq) (*CreateUserRes, error)
+	Login(cfg configs.Config, c context.Context, req *LoginUserReq) (*LoginUserRes, error)
 }

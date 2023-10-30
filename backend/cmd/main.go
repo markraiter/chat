@@ -44,6 +44,6 @@ func main() {
 	wsHandler := websocket.NewHandler(hub)
 	go hub.Run()
 
-	router.InitRouter(userHandler, wsHandler)
+	router.InitRouter(cfg, userHandler, wsHandler)
 	router.Start(cfg.Server.AppAddress)
 }

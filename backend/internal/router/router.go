@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/markraiter/chat/internal/configs"
 	"github.com/markraiter/chat/internal/user"
 	"github.com/markraiter/chat/internal/websocket"
 	swaggerFiles "github.com/swaggo/files"
@@ -10,14 +11,14 @@ import (
 
 var r *gin.Engine
 
-func InitRouter(userHandler *user.Handler, wsHandler *websocket.Handler) {
+func InitRouter(cfg configs.Config, userHandler *user.Handler, wsHandler *websocket.Handler) {
 	r = gin.Default()
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.POST("/signup", userHandler.CreateUser)
-	r.POST("/login", userHandler.Login)
-	r.GET("/logout", userHandler.Logout)
+	r.POST("/signup", userHandler.CreateUser(cfg))
+	r.POST("/login", userHandler.Login(cfg))
+	r.GET("/logout", userHandler.Logout(cfg))
 
 	r.POST("/ws/create-room", wsHandler.CreateRoom)
 	r.GET("/ws/join-room:room_id", wsHandler.JoinRoom)

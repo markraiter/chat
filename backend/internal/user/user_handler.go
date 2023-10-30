@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/markraiter/chat/internal/configs"
 	"github.com/markraiter/chat/internal/util"
 )
 
@@ -27,24 +28,27 @@ func NewHandler(s Service) *Handler {
 // @Failure 406 {object} util.Response
 // @Failure 500 {object} util.Response
 // @Router /signup [post].
-func (h *Handler) CreateUser(c *gin.Context) {
-	var u CreateUserReq
-	if err := c.ShouldBindJSON(&u); err != nil {
-		c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
+func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var u CreateUserReq
+		if err := c.ShouldBindJSON(&u); err != nil {
+			c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
+
+			return
+		}
+
+		res, err := h.Service.CreateUser(cfg, c.Request.Context(), &u)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, util.Response{Message: err.Error()})
+
+			return
+		}
+
+		c.JSON(http.StatusCreated, util.Response{Message: res.ID})
 
 		return
 	}
 
-	res, err := h.Service.CreateUser(c.Request.Context(), &u)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, util.Response{Message: err.Error()})
-
-		return
-	}
-
-	c.JSON(http.StatusCreated, util.Response{Message: res.ID})
-
-	return
 }
 
 // @Summary Login
@@ -59,25 +63,27 @@ func (h *Handler) CreateUser(c *gin.Context) {
 // @Failure 406 {object} util.Response
 // @Failure 500 {object} util.Response
 // @Router /login [post].
-func (h *Handler) Login(c *gin.Context) {
-	var user LoginUserReq
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
+func (h *Handler) Login(cfg configs.Config) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user LoginUserReq
+		if err := c.ShouldBindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
+
+			return
+		}
+
+		u, err := h.Service.Login(cfg, c.Request.Context(), &user)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, util.Response{Message: err.Error()})
+
+			return
+		}
+
+		c.SetCookie("jwt", u.accessToken, 3600, "/", "localhost", false, true)
+		c.JSON(http.StatusOK, util.Response{Message: "you are logged in"})
 
 		return
 	}
-
-	u, err := h.Service.Login(c.Request.Context(), &user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, util.Response{Message: err.Error()})
-
-		return
-	}
-
-	c.SetCookie("jwt", u.accessToken, 3600, "/", "localhost", false, true)
-	c.JSON(http.StatusOK, util.Response{Message: "you are logged in"})
-
-	return
 }
 
 // @Summary Logout
@@ -87,9 +93,11 @@ func (h *Handler) Login(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} util.Response
 // @Router /logout [get].
-func (h *Handler) Logout(c *gin.Context) {
-	c.SetCookie("jwt", "", -1, "", "", false, true)
-	c.JSON(http.StatusOK, util.Response{Message: "logout successful"})
+func (h *Handler) Logout(cfg configs.Config) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.SetCookie("jwt", "", -1, "", "", false, true)
+		c.JSON(http.StatusOK, util.Response{Message: "logout successful"})
 
-	return
+		return
+	}
 }
