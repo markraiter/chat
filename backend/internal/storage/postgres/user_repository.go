@@ -1,9 +1,11 @@
-package user
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/markraiter/chat/internal/models"
 )
 
 type DBTX interface {
@@ -17,11 +19,11 @@ type repository struct {
 	db DBTX
 }
 
-func NewRepository(db DBTX) Repository {
+func NewRepository(db DBTX) *repository {
 	return &repository{db: db}
 }
 
-func (r *repository) CreateUser(ctx context.Context, user *User) (*User, error) {
+func (r *repository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	var lastInsertID int
 	query := "INSERT INTO users(username, password, email) VALUES ($1, $2, $3) returning id"
 	if err := r.db.QueryRowContext(ctx, query, user.Username, user.Password, user.Email).Scan(&lastInsertID); err != nil {
@@ -33,8 +35,8 @@ func (r *repository) CreateUser(ctx context.Context, user *User) (*User, error) 
 	return user, nil
 }
 
-func (r *repository) GetUserByEmail(ctx context.Context, email string) (*User, error) {
-	u := User{}
+func (r *repository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	u := models.User{}
 
 	query := "SELECT id, email, username, password FROM users WHERE email = $1"
 	if err := r.db.QueryRowContext(ctx, query, email).Scan(&u.ID, &u.Email, &u.Username, &u.Password); err != nil {

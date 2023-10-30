@@ -1,32 +1,43 @@
 basePath: /
 definitions:
-  user.CreateUserReq:
+  handlers.CreateRoomReq:
     properties:
-      email:
+      id:
+        example: "1"
         type: string
-      password:
-        type: string
-      username:
+      name:
+        example: Room_1
         type: string
     type: object
-  user.LoginUserReq:
+  models.CreateUserReq:
     properties:
       email:
+        example: admin@example.com
         type: string
       password:
+        example: password12345
+        minLength: 8
+        type: string
+      username:
+        example: Chat_User_1
+        type: string
+    required:
+    - username
+    type: object
+  models.LoginUserReq:
+    properties:
+      email:
+        example: admin@example.com
+        type: string
+      password:
+        example: password12345
+        minLength: 8
         type: string
     type: object
   util.Response:
     properties:
       message:
         example: response message
-        type: string
-    type: object
-  websocket.CreateRoomReq:
-    properties:
-      id:
-        type: string
-      name:
         type: string
     type: object
 info:
@@ -37,6 +48,22 @@ info:
   title: CHAT APP
   version: "1.0"
 paths:
+  /health:
+    get:
+      consumes:
+      - '*/*'
+      description: Ping health of API for Docker.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show the status of server.
+      tags:
+      - Health
   /login:
     post:
       consumes:
@@ -49,7 +76,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/user.LoginUserReq'
+          $ref: '#/definitions/models.LoginUserReq'
       produces:
       - application/json
       responses:
@@ -98,7 +125,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/user.CreateUserReq'
+          $ref: '#/definitions/models.CreateUserReq'
       produces:
       - application/json
       responses:
@@ -133,7 +160,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/websocket.CreateRoomReq'
+          $ref: '#/definitions/handlers.CreateRoomReq'
       produces:
       - application/json
       responses:
@@ -143,6 +170,10 @@ paths:
             $ref: '#/definitions/util.Response'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "406":
+          description: Not Acceptable
           schema:
             $ref: '#/definitions/util.Response'
       summary: CreateRoom

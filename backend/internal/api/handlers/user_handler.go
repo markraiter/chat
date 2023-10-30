@@ -1,12 +1,19 @@
-package user
+package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/markraiter/chat/internal/configs"
+	"github.com/markraiter/chat/internal/models"
 	"github.com/markraiter/chat/internal/util"
 )
+
+type Service interface {
+	CreateUser(cfg configs.Config, c context.Context, req *models.CreateUserReq) (*models.CreateUserRes, error)
+	Login(cfg configs.Config, c context.Context, req *models.LoginUserReq) (*models.LoginUserRes, error)
+}
 
 type Handler struct {
 	Service
@@ -22,7 +29,7 @@ func NewHandler(s Service) *Handler {
 // @ID create-account
 // @Accept  json
 // @Produce  json
-// @Param input body user.CreateUserReq true "account info"
+// @Param input body models.CreateUserReq true "account info"
 // @Success 201 {object} util.Response
 // @Failure 400 {object} util.Response
 // @Failure 406 {object} util.Response
@@ -30,9 +37,15 @@ func NewHandler(s Service) *Handler {
 // @Router /signup [post].
 func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var u CreateUserReq
+		var u models.CreateUserReq
 		if err := c.ShouldBindJSON(&u); err != nil {
 			c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
+
+			return
+		}
+
+		if err := validate.Struct(u); err != nil {
+			c.JSON(http.StatusNotAcceptable, util.Response{Message: err.Error()})
 
 			return
 		}
@@ -46,7 +59,6 @@ func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
 
 		c.JSON(http.StatusCreated, util.Response{Message: res.ID})
 	}
-
 }
 
 // @Summary Login
@@ -55,7 +67,7 @@ func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
 // @ID login
 // @Accept  json
 // @Produce  json
-// @Param input body user.LoginUserReq true "credentials"
+// @Param input body models.LoginUserReq true "credentials"
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response
 // @Failure 406 {object} util.Response
@@ -63,9 +75,15 @@ func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
 // @Router /login [post].
 func (h *Handler) Login(cfg configs.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var user LoginUserReq
+		var user models.LoginUserReq
 		if err := c.ShouldBindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
+
+			return
+		}
+
+		if err := validate.Struct(user); err != nil {
+			c.JSON(http.StatusNotAcceptable, util.Response{Message: err.Error()})
 
 			return
 		}
@@ -77,7 +95,7 @@ func (h *Handler) Login(cfg configs.Config) gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("jwt", u.accessToken, 3600, "/", "localhost", false, true)
+		c.SetCookie("jwt", u.AccessToken, 3600, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, util.Response{Message: "you are logged in"})
 	}
 }

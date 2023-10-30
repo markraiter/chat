@@ -18,6 +18,30 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/health": {
+            "get": {
+                "description": "Ping health of API for Docker.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Show the status of server.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Login",
@@ -39,7 +63,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.LoginUserReq"
+                            "$ref": "#/definitions/models.LoginUserReq"
                         }
                     }
                 ],
@@ -113,7 +137,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.CreateUserReq"
+                            "$ref": "#/definitions/models.CreateUserReq"
                         }
                     }
                 ],
@@ -166,7 +190,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/websocket.CreateRoomReq"
+                            "$ref": "#/definitions/handlers.CreateRoomReq"
                         }
                     }
                 ],
@@ -179,6 +203,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/util.Response"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable",
                         "schema": {
                             "$ref": "#/definitions/util.Response"
                         }
@@ -289,28 +319,51 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "user.CreateUserReq": {
+        "handlers.CreateRoomReq": {
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string"
+                "id": {
+                    "type": "string",
+                    "example": "1"
                 },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
+                "name": {
+                    "type": "string",
+                    "example": "Room_1"
                 }
             }
         },
-        "user.LoginUserReq": {
+        "models.CreateUserReq": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "admin@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "password12345"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "Chat_User_1"
+                }
+            }
+        },
+        "models.LoginUserReq": {
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin@example.com"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "password12345"
                 }
             }
         },
@@ -320,17 +373,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "response message"
-                }
-            }
-        },
-        "websocket.CreateRoomReq": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         }

@@ -1,4 +1,4 @@
-package websocket
+package handlers
 
 import (
 	"fmt"
@@ -6,20 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/markraiter/chat/internal/models"
 	"github.com/markraiter/chat/internal/util"
 )
 
-type Handler struct {
-	hub *Hub
+type WSHandler struct {
+	hub *models.Hub
 }
 
-func NewHandler(h *Hub) *Handler {
-	return &Handler{hub: h}
+func NewWSHandler(h *models.Hub) *WSHandler {
+	return &WSHandler{hub: h}
 }
 
 type CreateRoomReq struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   string `json:"id" example:"1"`
+	Name string `json:"name" example:"Room_1"`
 }
 
 // @Summary CreateRoom
@@ -31,8 +32,9 @@ type CreateRoomReq struct {
 // @Param input body CreateRoomReq true "room info"
 // @Success 201 {object} util.Response
 // @Failure 400 {object} util.Response
+// @Failure 406 {object} util.Response
 // @Router /ws/create-room [post].
-func (h *Handler) CreateRoom(c *gin.Context) {
+func (h *WSHandler) CreateRoom(c *gin.Context) {
 	var req CreateRoomReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
@@ -40,10 +42,16 @@ func (h *Handler) CreateRoom(c *gin.Context) {
 		return
 	}
 
-	h.hub.Rooms[req.ID] = &Room{
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusNotAcceptable, util.Response{Message: err.Error()})
+
+		return
+	}
+
+	h.hub.Rooms[req.ID] = &models.Room{
 		ID:      req.ID,
 		Name:    req.Name,
-		Clients: make(map[string]*Client),
+		Clients: make(map[string]*models.Client),
 	}
 
 	c.JSON(http.StatusCreated, util.Response{Message: fmt.Sprintf("room %s created", req.Name)})
@@ -71,7 +79,7 @@ var upgrader = websocket.Upgrader{
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response
 // @Router /ws/join-room [get].
-func (h *Handler) JoinRoom(c *gin.Context) {
+func (h *WSHandler) JoinRoom(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, util.Response{Message: err.Error()})
@@ -83,15 +91,15 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 	clientID := c.Query("user_id")
 	username := c.Query("username")
 
-	cl := &Client{
+	cl := &models.Client{
 		Conn:     conn,
-		Message:  make(chan *Message, 10),
+		Message:  make(chan *models.Message, 10),
 		ID:       clientID,
 		RoomID:   roomID,
 		Username: username,
 	}
 
-	m := &Message{
+	m := &models.Message{
 		Content:  "A new user has joined the room",
 		RoomID:   roomID,
 		Username: username,
@@ -100,8 +108,8 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 	h.hub.Register <- cl
 	h.hub.Broadcast <- m
 
-	go cl.writeMessage()
-	cl.readMessage(h.hub)
+	go cl.WriteMessage()
+	cl.ReadMessage(h.hub)
 }
 
 type RoomRes struct {
@@ -116,7 +124,7 @@ type RoomRes struct {
 // @Produce  json
 // @Success 200 {object} util.Response
 // @Router /ws/get-rooms [get].
-func (h *Handler) GetRooms(c *gin.Context) {
+func (h *WSHandler) GetRooms(c *gin.Context) {
 	rooms := make([]RoomRes, 0)
 
 	for _, r := range h.hub.Rooms {
@@ -142,7 +150,7 @@ type ClientRes struct {
 // @Param room_id path string true "room_id"
 // @Success 200 {object} util.Response
 // @Router /ws/get-clients [get].
-func (h *Handler) GetClients(c *gin.Context) {
+func (h *WSHandler) GetClients(c *gin.Context) {
 	var clients []ClientRes
 	roomID := c.Param("room_id")
 

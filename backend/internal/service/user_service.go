@@ -1,4 +1,4 @@
-package user
+package service
 
 import (
 	"context"
@@ -8,22 +8,28 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/markraiter/chat/internal/configs"
+	"github.com/markraiter/chat/internal/models"
 	"github.com/markraiter/chat/internal/util"
 )
+
+type Repository interface {
+	CreateUser(ctx context.Context, user *models.User) (*models.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+}
 
 type service struct {
 	Repository
 	timeout time.Duration
 }
 
-func NewService(repository Repository) Service {
+func NewService(repository Repository) *service {
 	return &service{
 		repository,
 		time.Duration(2) * time.Second,
 	}
 }
 
-func (s *service) CreateUser(cfg configs.Config, c context.Context, req *CreateUserReq) (*CreateUserRes, error) {
+func (s *service) CreateUser(cfg configs.Config, c context.Context, req *models.CreateUserReq) (*models.CreateUserRes, error) {
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
@@ -32,7 +38,7 @@ func (s *service) CreateUser(cfg configs.Config, c context.Context, req *CreateU
 		return nil, fmt.Errorf("user_service CreateUser() error: %w", err)
 	}
 
-	u := &User{
+	u := &models.User{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: hashedPassword,
@@ -43,7 +49,7 @@ func (s *service) CreateUser(cfg configs.Config, c context.Context, req *CreateU
 		return nil, fmt.Errorf("user_service CreateUser() error: %w", err)
 	}
 
-	res := &CreateUserRes{
+	res := &models.CreateUserRes{
 		ID:       strconv.Itoa(int(r.ID)),
 		Username: r.Username,
 		Email:    r.Email,
@@ -58,7 +64,7 @@ type MyJWTClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (s *service) Login(cfg configs.Config, c context.Context, req *LoginUserReq) (*LoginUserRes, error) {
+func (s *service) Login(cfg configs.Config, c context.Context, req *models.LoginUserReq) (*models.LoginUserRes, error) {
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
@@ -85,8 +91,8 @@ func (s *service) Login(cfg configs.Config, c context.Context, req *LoginUserReq
 		return nil, fmt.Errorf("user_service Login() error: %w", err)
 	}
 
-	return &LoginUserRes{
-		accessToken: ss,
+	return &models.LoginUserRes{
+		AccessToken: ss,
 		ID:          strconv.Itoa(int(u.ID)),
 		Username:    u.Username,
 	}, nil

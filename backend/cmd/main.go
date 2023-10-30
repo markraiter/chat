@@ -6,11 +6,12 @@ import (
 
 	_ "github.com/markraiter/chat/docs"
 
+	"github.com/markraiter/chat/internal/api"
+	"github.com/markraiter/chat/internal/api/handlers"
 	"github.com/markraiter/chat/internal/configs"
-	"github.com/markraiter/chat/internal/router"
+	"github.com/markraiter/chat/internal/models"
+	"github.com/markraiter/chat/internal/service"
 	"github.com/markraiter/chat/internal/storage/postgres"
-	"github.com/markraiter/chat/internal/user"
-	"github.com/markraiter/chat/internal/websocket"
 )
 
 //	@title			CHAT APP
@@ -36,17 +37,17 @@ func main() {
 		log.Fatalf("could not initialize database connection: %s\n", err.Error())
 	}
 
-	userRepository := user.NewRepository(dbConn.GetDB())
-	userService := user.NewService(userRepository)
-	userHandler := user.NewHandler(userService)
+	userRepository := postgres.NewRepository(dbConn.GetDB())
+	userService := service.NewService(userRepository)
+	userHandler := handlers.NewHandler(userService)
 
-	hub := websocket.NewHub()
-	wsHandler := websocket.NewHandler(hub)
+	hub := models.NewHub()
+	wsHandler := handlers.NewWSHandler(hub)
 	go hub.Run()
 
-	router.InitRouter(cfg, userHandler, wsHandler)
+	api.InitRouter(cfg, userHandler, wsHandler)
 
-	if err := router.Start(cfg.Server.AppAddress); err != nil {
+	if err := api.Start(cfg.Server.AppAddress); err != nil {
 		log.Fatalf("error starting server: %s", err.Error())
 	}
 }

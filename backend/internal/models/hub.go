@@ -1,4 +1,4 @@
-package websocket
+package models
 
 type Room struct {
 	ID      string             `json:"id"`
