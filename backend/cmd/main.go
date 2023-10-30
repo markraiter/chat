@@ -45,5 +45,8 @@ func main() {
 	go hub.Run()
 
 	router.InitRouter(cfg, userHandler, wsHandler)
-	router.Start(cfg.Server.AppAddress)
+
+	if err := router.Start(cfg.Server.AppAddress); err != nil {
+		log.Fatalf("error starting server: %s", err.Error())
+	}
 }

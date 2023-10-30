@@ -31,7 +31,9 @@ func (c *Client) writeMessage() {
 			return
 		}
 
-		c.Conn.WriteJSON(message)
+		if err := c.Conn.WriteJSON(message); err != nil {
+			log.Printf("error sending message: %s", err)
+		}
 	}
 }
 

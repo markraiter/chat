@@ -47,8 +47,6 @@ func (h *Handler) CreateRoom(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, util.Response{Message: fmt.Sprintf("room %s created", req.Name)})
-
-	return
 }
 
 var upgrader = websocket.Upgrader{
@@ -163,6 +161,4 @@ func (h *Handler) GetClients(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, clients)
-
-	return
 }

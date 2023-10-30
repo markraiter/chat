@@ -11,8 +11,6 @@ import (
 	"github.com/markraiter/chat/internal/util"
 )
 
-const secretKey = "secret"
-
 type service struct {
 	Repository
 	timeout time.Duration

@@ -45,8 +45,6 @@ func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, util.Response{Message: res.ID})
-
-		return
 	}
 
 }
@@ -81,8 +79,6 @@ func (h *Handler) Login(cfg configs.Config) gin.HandlerFunc {
 
 		c.SetCookie("jwt", u.accessToken, 3600, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, util.Response{Message: "you are logged in"})
-
-		return
 	}
 }
 
@@ -97,7 +93,5 @@ func (h *Handler) Logout(cfg configs.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.SetCookie("jwt", "", -1, "", "", false, true)
 		c.JSON(http.StatusOK, util.Response{Message: "logout successful"})
-
-		return
 	}
 }
