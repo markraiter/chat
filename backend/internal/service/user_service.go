@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -15,6 +16,8 @@ import (
 type Repository interface {
 	CreateUser(ctx context.Context, user *models.User) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+	GetEmail(ctx context.Context, email string) string
+	GetUsername(ctx context.Context, username string) string
 }
 
 type service struct {
@@ -33,20 +36,31 @@ func (s *service) CreateUser(cfg configs.Config, c context.Context, req *models.
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
+	uEmail := s.GetEmail(c, req.Email)
+	uUsername := s.GetUsername(c, req.Username)
+
+	if strings.ToLower(uEmail) == strings.ToLower(req.Email) {
+		return nil, fmt.Errorf("user_service error: %w", util.ErrEmailExist)
+	}
+
+	if uUsername == req.Username {
+		return nil, fmt.Errorf("user_service error: %w", util.ErrUsernameExist)
+	}
+
 	hashedPassword, err := util.HashPassword(req.Password)
 	if err != nil {
-		return nil, fmt.Errorf("user_service CreateUser() error: %w", err)
+		return nil, fmt.Errorf("user_service error: %w", err)
 	}
 
 	u := &models.User{
 		Username: req.Username,
-		Email:    req.Email,
+		Email:    strings.ToLower(req.Email),
 		Password: hashedPassword,
 	}
 
 	r, err := s.Repository.CreateUser(ctx, u)
 	if err != nil {
-		return nil, fmt.Errorf("user_service CreateUser() error: %w", err)
+		return nil, fmt.Errorf("user_service error: %w", err)
 	}
 
 	res := &models.CreateUserRes{
@@ -70,11 +84,11 @@ func (s *service) Login(cfg configs.Config, c context.Context, req *models.Login
 
 	u, err := s.Repository.GetUserByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, fmt.Errorf("user_service Login() error: %w", err)
+		return nil, fmt.Errorf("user_service error: %w", err)
 	}
 
 	if err := util.CheckPassword(req.Password, u.Password); err != nil {
-		return nil, fmt.Errorf("user_service Login() error: %w", err)
+		return nil, fmt.Errorf("user_service error: %w", util.ErrWrongCredentials)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MyJWTClaims{
@@ -88,7 +102,7 @@ func (s *service) Login(cfg configs.Config, c context.Context, req *models.Login
 
 	ss, err := token.SignedString([]byte(cfg.Auth.SigningKey))
 	if err != nil {
-		return nil, fmt.Errorf("user_service Login() error: %w", err)
+		return nil, fmt.Errorf("user_service error: %w", err)
 	}
 
 	return &models.LoginUserRes{

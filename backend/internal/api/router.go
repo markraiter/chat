@@ -10,7 +10,7 @@ import (
 
 var r *gin.Engine
 
-func InitRouter(cfg configs.Config, userHandler *handlers.Handler, wsHandler *handlers.WSHandler) {
+func InitRoutes(cfg configs.Config, userHandler *handlers.Handler, wsHandler *handlers.WSHandler) {
 	r = gin.Default()
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -27,6 +27,6 @@ func InitRouter(cfg configs.Config, userHandler *handlers.Handler, wsHandler *ha
 	r.GET("/ws/get-clients/:room_id", wsHandler.GetClients)
 }
 
-func Start(addr string) error {
-	return r.Run(addr)
+func Start(cfg configs.Server) error {
+	return r.Run(cfg.AppAddress)
 }

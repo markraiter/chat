@@ -45,9 +45,9 @@ func main() {
 	wsHandler := handlers.NewWSHandler(hub)
 	go hub.Run()
 
-	api.InitRouter(cfg, userHandler, wsHandler)
+	api.InitRoutes(cfg, userHandler, wsHandler)
 
-	if err := api.Start(cfg.Server.AppAddress); err != nil {
+	if err := api.Start(cfg.Server); err != nil {
 		log.Fatalf("error starting server: %s", err.Error())
 	}
 }

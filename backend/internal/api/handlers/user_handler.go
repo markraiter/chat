@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -52,6 +53,11 @@ func (h *Handler) CreateUser(cfg configs.Config) gin.HandlerFunc {
 
 		res, err := h.Service.CreateUser(cfg, c.Request.Context(), &u)
 		if err != nil {
+			if errors.Is(err, util.ErrEmailExist) || errors.Is(err, util.ErrUsernameExist) {
+				c.JSON(http.StatusNotAcceptable, util.Response{Message: err.Error()})
+
+				return
+			}
 			c.JSON(http.StatusInternalServerError, util.Response{Message: err.Error()})
 
 			return
@@ -90,6 +96,11 @@ func (h *Handler) Login(cfg configs.Config) gin.HandlerFunc {
 
 		u, err := h.Service.Login(cfg, c.Request.Context(), &user)
 		if err != nil {
+			if errors.Is(err, util.ErrWrongCredentials) {
+				c.JSON(http.StatusUnauthorized, util.Response{Message: err.Error()})
+
+				return
+			}
 			c.JSON(http.StatusInternalServerError, util.Response{Message: err.Error()})
 
 			return

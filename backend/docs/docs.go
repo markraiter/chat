@@ -335,6 +335,8 @@ const docTemplate = `{
         "models.CreateUserReq": {
             "type": "object",
             "required": [
+                "email",
+                "password",
                 "username"
             ],
             "properties": {
@@ -349,12 +351,17 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string",
+                    "maxLength": 20,
                     "example": "Chat_User_1"
                 }
             }
         },
         "models.LoginUserReq": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string",

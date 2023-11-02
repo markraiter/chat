@@ -3,9 +3,11 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/markraiter/chat/internal/models"
+	"github.com/markraiter/chat/internal/util"
 )
 
 type DBTX interface {
@@ -40,8 +42,33 @@ func (r *repository) GetUserByEmail(ctx context.Context, email string) (*models.
 
 	query := "SELECT id, email, username, password FROM users WHERE email = $1"
 	if err := r.db.QueryRowContext(ctx, query, email).Scan(&u.ID, &u.Email, &u.Username, &u.Password); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, util.ErrWrongCredentials
+		}
 		return nil, fmt.Errorf("user_repository GetUserByEmail() error: %w", err)
 	}
 
 	return &u, nil
+}
+
+func (r *repository) GetEmail(ctx context.Context, email string) string {
+	u := models.User{}
+
+	query := "SELECT id, email, username, password FROM users WHERE email ILIKE $1"
+	if err := r.db.QueryRowContext(ctx, query, email).Scan(&u.ID, &u.Email, &u.Username, &u.Password); err != nil {
+		return ""
+	}
+
+	return u.Email
+}
+
+func (r *repository) GetUsername(ctx context.Context, username string) string {
+	u := models.User{}
+
+	query := "SELECT id, email, username, password FROM users WHERE username = $1"
+	if err := r.db.QueryRowContext(ctx, query, username).Scan(&u.ID, &u.Email, &u.Username, &u.Password); err != nil {
+		return ""
+	}
+
+	return u.Username
 }
