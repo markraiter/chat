@@ -19,7 +19,7 @@ import (
 //	@description	Docs for chat app backend API
 //	@contact.name	Mark Raiter
 //	@contact.email	raitermark@proton.me
-//  host  			localhost:9000
+//  @host  			localhost:9000
 //	@BasePath		/
 
 func main() {
