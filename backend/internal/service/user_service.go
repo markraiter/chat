@@ -39,7 +39,7 @@ func (s *service) CreateUser(cfg configs.Config, c context.Context, req *models.
 	uEmail := s.GetEmail(c, req.Email)
 	uUsername := s.GetUsername(c, req.Username)
 
-	if strings.ToLower(uEmail) == strings.ToLower(req.Email) {
+	if strings.EqualFold(uEmail, req.Email) {
 		return nil, fmt.Errorf("user_service error: %w", util.ErrEmailExist)
 	}
 
