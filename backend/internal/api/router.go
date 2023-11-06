@@ -21,10 +21,14 @@ func InitRoutes(cfg configs.Config, userHandler *handlers.Handler, wsHandler *ha
 	r.POST("/login", userHandler.Login(cfg))
 	r.GET("/logout", userHandler.Logout(cfg))
 
-	r.POST("/ws/create-room", wsHandler.CreateRoom)
-	r.GET("/ws/join-room/:room_id", wsHandler.JoinRoom)
-	r.GET("/ws/get-rooms", wsHandler.GetRooms)
-	r.GET("/ws/get-clients/:room_id", wsHandler.GetClients)
+	ws := r.Group("/ws")
+	{
+		ws.POST("/create-room", wsHandler.CreateRoom)
+		ws.GET("/join-room/:room_id", wsHandler.JoinRoom)
+		ws.GET("/get-rooms", wsHandler.GetRooms)
+		ws.GET("/get-clients/:room_id", wsHandler.GetClients)
+	}
+
 }
 
 func Start(cfg configs.Server) error {
